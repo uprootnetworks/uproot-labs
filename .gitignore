@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+
+# Logs & temp files
+*.log
+*.tmp
+*.swp
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Secrets / local config
+.env
+*.env
+config.local.yml
+secrets.yaml
+lab1-branch_fw_default_config.xml
+lab1-app_fw_default_config.xml
