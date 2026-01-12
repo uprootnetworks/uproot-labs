@@ -66,6 +66,26 @@ These files are required to run the labs as demonstrated in the videos.
 
 ## Usage
 
+### Tool Usage
+Run command 'uproot {labId} --{arg}|-{arg}' from command line of the Ubuntu host in your lab.  Available arguments are listed below:
+
+Example: 'uproot lab1 -a' will introduce faults to every node in the lab environment, which you then need to troubleshoot to dig yourself out.  If you become stumped, the command 'uproot lab1 -d' will reset your lab environment back to default settings.
+```
+root@ubuntu:~# uproot lab1 --help
+usage: break_things.py [-h] [-a] [-s] [-r] [-f] [-d]
+
+options:
+  -h, --help      show this help message and exit
+
+NETWORK:
+  -a, --all       Reconfigures all available options - a.k.a breaks everything :)
+  -s, --switch    Adds incorrect configuration to Branch Switch1
+  -r, --router    Reconfigures SP-Router1 and SP-Router2 with random faults
+  -f, --firewall  Reconfigures Branch-FW and App-FW with random faults
+  -d, --default   Restores all nodes to default settings
+root@ubuntu:~# 
+```
+
 ### Installation
 
 Manual installation (For use when manually installing EVE-NG lab from scratch): 
@@ -99,25 +119,6 @@ Additional labs and tools will be released as new videos are produced.  To updat
 uproot update
 ```
 
-### Tool Usage
-Run command 'uproot {labId} --{arg}|-{arg}' from command line of the Ubuntu host in your lab.  Available arguments are listed below:
-
-Example: 'uproot lab1 -a' will introduce faults to every node in the lab environment, which you then need to troubleshoot to dig yourself out.  If you become stumped, the command 'uproot lab1 -d' will reset your lab environment back to default settings.
-```
-root@ubuntu:~# uproot lab1 --help
-usage: break_things.py [-h] [-a] [-s] [-r] [-f] [-d]
-
-options:
-  -h, --help      show this help message and exit
-
-NETWORK:
-  -a, --all       Reconfigures all available options - a.k.a breaks everything :)
-  -s, --switch    Adds incorrect configuration to Branch Switch1
-  -r, --router    Reconfigures SP-Router1 and SP-Router2 with random faults
-  -f, --firewall  Reconfigures Branch-FW and App-FW with random faults
-  -d, --default   Restores all nodes to default settings
-root@ubuntu:~# 
-```
 ---
 ## Requirements
 	•	EVE-NG installed either as baremetal or nested within a hypervisor (Tested with Proxmox and VMware ESXI)
