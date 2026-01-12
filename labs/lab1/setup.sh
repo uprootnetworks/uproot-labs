@@ -359,26 +359,60 @@ log "Installing Python requirements..."
 python3 -m pip install -r "${BASE_HOME}/uproot/labs/lab1/requirements.txt" --break-system-packages --ignore-installed
 
 log "Installing /usr/local/bin/uproot launcher..."
+
 cat <<'EOF' >/usr/local/bin/uproot
 #!/usr/bin/env bash
 set -euo pipefail
 
 BASE="/home/user/uproot/labs"
+UPDATE_SCRIPT="${BASE}/update.py"
 
 usage() {
-  echo "Usage: uproot <lab> [args]"
-  echo "Example: uproot lab1 -v"
+  cat <<USAGE
+Usage:
+  uproot <lab> [args]
+  uproot update
+
+Examples:
+  uproot lab1 -v
+  uproot update
+USAGE
   exit 2
 }
 
 [[ $# -ge 1 ]] || usage
 
-LAB="$1"; shift
+COMMAND="$1"; shift || true
+
+# -----------------------------
+# Built-in commands
+# -----------------------------
+case "$COMMAND" in
+  update)
+    [[ -f "$UPDATE_SCRIPT" ]] || {
+      echo "Missing update script: $UPDATE_SCRIPT" >&2
+      exit 2
+    }
+    exec python3 "$UPDATE_SCRIPT" "$@"
+    ;;
+esac
+
+# -----------------------------
+# Lab execution
+# -----------------------------
+LAB="$COMMAND"
 LABDIR="${BASE}/${LAB}"
 PY="${LABDIR}/break_things.py"
 
-[[ -d "$LABDIR" ]] || { echo "Unknown lab: $LAB (missing $LABDIR)" >&2; exit 2; }
-[[ -f "$PY" ]]     || { echo "Missing: $PY" >&2; exit 2; }
+[[ -d "$LABDIR" ]] || {
+  echo "Unknown lab: $LAB (missing $LABDIR)" >&2
+  exit 2
+}
+
+[[ -f "$PY" ]] || {
+  echo "Missing lab entrypoint: $PY" >&2
+  exit 2
+}
 
 exec python3 "$PY" "$@"
 EOF
@@ -386,3 +420,4 @@ EOF
 chmod +x /usr/local/bin/uproot
 
 log "Setup complete."
+
