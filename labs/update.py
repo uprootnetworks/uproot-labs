@@ -5,7 +5,7 @@ import os
 import tempfile
 import zipfile
 import shutil
-
+import tarfile
 
 from pathlib import Path
 
@@ -50,34 +50,38 @@ def fetch_latest_release():
         raise RuntimeError(f"GithHub API error {resp.status_code}: {resp.text[:300]}")
     data = resp.json()
     version = data.get("tag_name")
-    zip_url = data.get("zipball_url")
-    return version, zip_url
+    tar_url = data.get("tarball_url")
+    return version, tar_url
 
-def update_check(version, latest_version, zipball_url):
+def update_check(version, latest_version, tarball_url):
     if version == latest_version:
         logger.info("Current version is up to date")
     elif version != latest_version:
         logger.info("Newer release is available: %s", latest_version)
-        download_latest(zipball_url)
+        download_latest(tarball_url)
 
 
-def download_latest(zipball_url):
-    logger.info("Downloading update from GitHub (%s)", zipball_url)
-    resp=r.get(zipball_url, timeout=60)
+def download_latest(tarball_url):
+    logger.info("Downloading update from GitHub (%s)", tarball_url)
+    resp=r.get(tarball_url, timeout=60)
     if resp.status_code != 200:
         raise RuntimeError(f"Download failed with response code {resp.status_code}: {resp.text[:300]}")
 
     with tempfile.TemporaryDirectory(prefix="uproot_update_") as td:
         tmp = Path(td)
-        zip_path = tmp / "release.zip"
+        tar_path = tmp / "release.tar.gz"
         extract_dir = tmp / "extract"
+        
+        with open(tar_path, "wb") as f:
+            for chunk in resp.iter_content(chunk_size=1024 * 356):
+                if chunk:
+                    f.write(chunk)
 
-        zip_path.write_bytes(resp.content)
 
-        logger.info("Extracting update.zip to tmp/uproot_update_/")
+        logger.info("Extracting update.tar.gz to tmp/uproot_update_/")
         extract_dir.mkdir(parents=True, exist_ok=True)
-        with zipfile.ZipFile(zip_path) as zf:
-            zf.extractall(extract_dir)
+        with tarfile.open(tar_path) as tf:
+            tf.extractall(extract_dir)
 
         top_dirs = [p for p in extract_dir.iterdir() if p.is_dir()]
         if len(top_dirs) !=1:
@@ -107,5 +111,5 @@ def download_latest(zipball_url):
 
 setup_logging()
 current_version = read_current_version()
-latest_version, zip_url = fetch_latest_release()
-update_check(current_version, latest_version, zip_url)
+latest_version, tar_url = fetch_latest_release()
+update_check(current_version, latest_version, tar_url)
