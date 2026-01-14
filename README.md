@@ -35,7 +35,7 @@ Options for configuring EVE-NG:
   → *YouTube walkthrough:* https://youtu.be/lfiP-Zeb96o?si=OlBHXkaZJNyDcHVx 
 
 - Or install them via **automation**  
-  → *Automated install video:* Video to be released shortly
+  → *Automated install video:* https://youtu.be/5GpylvQv_1Y?si=ITlUR70bEyeLheEW
 
 
 ---
